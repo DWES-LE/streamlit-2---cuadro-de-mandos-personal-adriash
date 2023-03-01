@@ -9,32 +9,31 @@ URL = 'Games.csv'
 list_original = pd.read_csv(URL)
 
 list_original['Status'] = list_original['Status'].astype(int)
+
 # Título
 
 st.title('Lista de juegos Geforce')
 
-# Filtrar la lista por compañia
+# Filtrar la lista por juegos compatibles o no con radio button
 
-bandai_games = st.checkbox('Mostrar todos los juego publicado por la compañia Bandai Namco')
-devolver_games = st.checkbox('Mostrar todos los juego publicado por la compañia Devolver Digital')
-bethesda = st.checkbox('Mostrar todos los juego publicado por la compañia Bethesda')
+compatibilidad_opti = st.radio('Mostrar todos los juego publicado por la compañia Bandai Namco',
+                    ('Todos','Optimizados', 'No optimizados'))
 
-#filtramos los juegos con los atributos de compañias
+# Filtrar la lista por compañia utilizando selección múltiple
 
-if (bandai_games) & (devolver_games) & (bethesda):
-    list = list_original[(list_original['Publisher'] == 'BANDAI NAMCO Studio Inc.') | (list_original['Publisher'] == 'BANDAI NAMCO Entertainment') | (list_original['Publisher'] == 'Devolver Digital') | (list_original['Publisher'] == 'Bethesda Softworks')]
-elif (bandai_games) & (devolver_games):
-    list = list_original[(list_original['Publisher'] == 'BANDAI NAMCO Studio Inc.') | (list_original['Publisher'] == 'BANDAI NAMCO Entertainment') | (list_original['Publisher'] == 'Devolver Digital')]
-elif (devolver_games) & (bethesda):
-    list = list_original[(list_original['Publisher'] == 'Devolver Digital') | (list_original['Publisher'] == 'Bethesda Softworks')]
-elif (bandai_games) & (bethesda):
-    list = list_original[(list_original['Publisher'] == 'BANDAI NAMCO Studio Inc.') | (list_original['Publisher'] == 'BANDAI NAMCO Entertainment') | (list_original['Publisher'] == 'Bethesda Softworks')]
-elif bandai_games:
-    list = list_original[(list_original['Publisher'] == 'BANDAI NAMCO Studio Inc.') | (list_original['Publisher'] == 'BANDAI NAMCO Entertainment')]
-elif devolver_games:
-    list = list_original[list_original['Publisher'] == 'Devolver Digital']
-elif bethesda:
-    list = list_original[list_original['Publisher'] == 'Bethesda Softworks']
+publisher_select = st.multiselect('Filtro por compañía', list_original.Publisher.unique())
+
+# Filtramos por la compatibilidad con la optimización de la app geforce
+
+if compatibilidad_opti == 'Optimizados':
+    list_original = list_original[list_original['Fully Optimized?'] =='Y']
+elif compatibilidad_opti == 'No optimizados':
+    list_original = list_original[list_original['Fully Optimized?'] == 'N']
+
+# Filtramos los juegos por compañia según la selección múltiple o dejamos la lista igual en caso de que no haya valores en la selección
+
+if publisher_select :
+    list = list_original[list_original['Publisher'].isin(publisher_select)]
 else:
     list = list_original
 
@@ -49,7 +48,3 @@ st.bar_chart(list.groupby('Highlights Supported?')['Status'].sum())
 
 st.subheader('Gráfico según la compatibilidad con la optimización Geforce')
 st.bar_chart(list.groupby('Fully Optimized?')['Status'].sum())
-
-# Creamos una gráfica a través de matplotlib
-
-plt.bar(list.groupby('Fully Optimized?')['Status'].sum())

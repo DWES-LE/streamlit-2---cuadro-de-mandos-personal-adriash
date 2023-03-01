@@ -32,3 +32,6 @@ Prepara y prueba la aplicación.
 
 ## Publica la aplicación.
 Publica la aplicación en Streamlit Cloud, en Heroku o en el servicio que prefieras https://docs.streamlit.io/streamlit-community-cloud/get-started/deploy-an-app
+
+
+
